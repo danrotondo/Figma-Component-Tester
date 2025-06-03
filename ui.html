@@ -5,174 +5,417 @@
   <title>Figma Plugin UI</title>
   <!-- <link rel="stylesheet" href="styles.css"> Link the CSS file -->
   <style>
-    /* General Reset */
-    body {
+    * {
       margin: 0;
-      font-family: "Arial", sans-serif;
-      background-color: #1c1e21; /* Dark background */
-      color: #e0e0e0; /* Light text color */
-
-      height: 100vh;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif;
     }
 
-    /* Center the content */
-    #main-ui, #loading-state, #success-state, #error-state {
+    html, body {
+      height: 100%;
+      min-width: 280px;
+      min-height: 320px;
+    }
+
+    body {
+      background: rgb(28, 28, 31);
+      color: white;
+      padding: 16px;
+      font-size: 14px;
+      line-height: 1.5;
+      overflow-y: auto;
+      overflow-x: hidden;
+    }
+
+    .container {
       display: flex;
+      flex-direction: column;
+      gap: 12px;
+      min-height: 100%;
+      width: 100%;
+    }
+
+    .header {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding-bottom: 4px;
+    }
+
+    h1 {
+      font-size: 20px;
+      font-weight: 600;
+      color: white;
+      margin: 0;
+    }
+
+    .description {
+      color: rgb(153, 153, 166);
+      font-size: 14px;
+      line-height: 1.5;
+      margin-bottom: 12px;
+    }
+
+    .card {
+      background: rgb(35, 37, 40);
+      border: 1px solid rgb(51, 54, 58);
+      border-radius: 4px;
+      padding: 16px;
+      margin-bottom: 12px;
+    }
+
+    .options {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      padding: 4px 0;
+    }
+
+    .option {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 4px 0;
+    }
+
+    .checkbox-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      accent-color: rgb(0, 150, 255);
+      cursor: pointer;
+    }
+
+    label {
+      font-size: 14px;
+      color: white;
+      cursor: pointer;
+    }
+
+    .option-description {
+      color: rgb(153, 153, 166);
+      font-size: 13px;
+      margin-top: 4px;
+    }
+
+    /* SUI Button Base Styles */
+    .sui-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 32px;
+      padding: 0 12px;
+      border-radius: 3px;
+      font-size: 14px;
+      font-weight: 500;
+      line-height: 1;
+      transition: all 0.1s ease-in-out;
+      cursor: pointer;
+      border: 1px solid transparent;
+      font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      position: relative;
+      text-decoration: none;
+      white-space: nowrap;
+      user-select: none;
+      margin: 8px 0;
+    }
+
+    /* Primary Button */
+    .sui-button-primary {
+      background: rgb(61, 126, 219);
+      color: rgb(255, 255, 255);
+      border-color: transparent;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    }
+
+    .sui-button-primary:hover {
+      background: rgb(46, 109, 200);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+    }
+
+    .sui-button-primary:active {
+      background: rgb(35, 96, 184);
+      box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+      transform: translateY(1px);
+    }
+
+    .sui-button-primary:disabled {
+      background: rgb(188, 190, 196);
+      color: rgb(255, 255, 255);
+      cursor: not-allowed;
+      opacity: 0.65;
+      box-shadow: none;
+    }
+
+    /* Subtle Button */
+    .sui-button-subtle {
+      background: transparent;
+      color: rgb(101, 109, 120);
+      border-color: transparent;
+    }
+
+    .sui-button-subtle:hover {
+      background: rgba(188, 190, 196, 0.15);
+      color: rgb(255, 255, 255);
+    }
+
+    .sui-button-subtle:active {
+      background: rgba(188, 190, 196, 0.25);
+      color: rgb(255, 255, 255);
+      transform: translateY(1px);
+    }
+
+    .sui-button-subtle:disabled {
+      background: transparent;
+      color: rgb(188, 190, 196);
+      cursor: not-allowed;
+      opacity: 0.65;
+    }
+
+    /* Remove old button styles */
+    button {
+      border: none;
+      outline: none;
+    }
+
+    .error {
+      color: rgb(255, 86, 86);
+      font-size: 13px;
+      margin-top: 8px;
+    }
+
+    .info-box {
+      background: rgba(0, 150, 255, 0.1);
+      border: 1px solid rgba(0, 150, 255, 0.2);
+      border-radius: 4px;
+      padding: 12px;
+      font-size: 12px;
+      color: rgb(153, 153, 166);
+      line-height: 1.5;
+      margin-bottom: 12px;
+    }
+
+    .info-box strong {
+      color: rgb(0, 150, 255);
+      font-weight: 500;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .loading-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgb(28, 28, 31);
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      height: 100vh;
-      margin-top:40px;
+      gap: 12px;
+      padding: 16px;
+      z-index: 1000;
     }
 
-    /* Button Styling */
-    button {
-      background-color: #007bff; /* Splunk Prisma blue */
-      color: white;
-      border: none;
-      border-radius: 4px;
-      padding: 10px 20px;
-      font-size: 16px;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
-    }
-
-    button:hover {
-      background-color: #0056b3; /* Darker blue on hover */
-    }
-
-    /* #loading-state {
-      text-align: center;
+    .loading-overlay.visible {
       display: flex;
-      justify-content: center;
+    }
+
+    .spinner-container {
+      display: flex;
+      flex-direction: column;
       align-items: center;
-      width:100vh;
-    } */
-
-    /* Flexbox for spinner and text */
-    .loading-container {
-      display: flex;
-      flex-direction: row; /* Align spinner and text horizontally */
-      align-items: center; /* Center align them vertically */
-      justify-content: center;
-      font-size: 14px;
-
-    }
-
-    /* Spinner Animation */
-    @keyframes spin {
-      0% {
-        transform: rotate(0deg);
-      }
-      100% {
-        transform: rotate(360deg);
-      }
+      gap: 16px;
     }
 
     .spinner {
-      margin-right: 8px; /* Add spacing between spinner and text */
-      border: 4px solid rgba(255, 255, 255, 0.3); /* Light semi-transparent border */
-      border-top: 4px solid #007bff; /* Blue border for the spinning part */
+      width: 32px;
+      height: 32px;
+      border: 2px solid rgba(0, 150, 255, 0.2);
+      border-top-color: rgb(0, 150, 255);
       border-radius: 50%;
-      width: 20px;
-      height: 20px;
-      animation: spin 1s linear infinite; /* Spin continuously */
+      animation: spin 0.75s linear infinite;
     }
 
-    #loading-state p {
-      font-size: 18px;
-      font-weight: bold;
-      color: #007bff; /* Splunk Prisma blue */
-      margin-top: 16px;
+    .loading-text {
+      font-size: 14px;
+      font-weight: 500;
+      color: white;
     }
 
-    /* Add subtle shadow to elements */
-    button, #loading-state {
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    .loading-subtext {
+      font-size: 13px;
+      color: rgb(153, 153, 166);
+      text-align: center;
+      max-width: 280px;
     }
 
-    /* Section Styling */
-    #section {
-      background-color: #2c2f33; /* Darker gray for sections */
-      border-radius: 8px;
-      padding: 16px;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+    .content {
+      transition: opacity 0.2s;
     }
-  
+
+    .content.hidden {
+      display: none;
+    }
+
+    .sui-button-subtle {
+      margin-top: 8px;
+      background: transparent;
+      color: rgb(61, 149, 255);
+      font-size: 14px;
+      padding: 6px 12px;
+    }
+
+    .sui-button-subtle:hover {
+      background: rgb(10, 47, 92);
+      color: rgb(158, 202, 255);
+    }
+
+    .sui-button-subtle:active {
+      background: rgb(10, 47, 92);
+      color: rgb(158, 202, 255);
+    }
   </style>
 </head>
 <body>
-   <!-- Main UI -->
-   <div id="main-ui">
-    <button id="start-button">Run Tests</button>
-  </div>
+  <div class="container">
+    <div class="content">
+      <div class="header">
+        <h1>Component Tester</h1>
+        <p class="description">Test your components with different property combinations, text variations, and size options. Select a component or component set in Figma before running tests.</p>
+      </div>
 
-  <!-- Loading State -->
-  <div id="loading-state" style="display: none; text-align: center;">
-    <div class="loading-container"><div class="spinner"></div> Loading...</div>
-    <p>Generating instances. Please wait.</p>
-  </div>
+      <div class="card">
+        <div class="info-box">
+          <strong>Pro tip:</strong> You can select either a single component or an entire component set. When selecting a component set, all variants will be tested automatically.
+        </div>
 
-  <!-- Success State -->
-  <div id="success-state" style="display: none; text-align: center;">
-    <p>✅ Process completed successfully!</p>
-    <button id="restart-button">Restart</button>
-  </div>
+        <div class="options">
+          <div class="option">
+            <div>
+              <div class="checkbox-wrapper">
+                <input type="checkbox" id="testTextLengths" checked>
+                <label for="testTextLengths">Test Text Lengths</label>
+              </div>
+              <p class="option-description">Creates variations of your component with different text lengths to test text wrapping and layout.</p>
+            </div>
+          </div>
 
-  <!-- Error State -->
-  <div id="error-state" style="display: none; text-align: center;">
-    <p>❌ Something went wrong. Please try again.</p>
-    <button id="restart-button-error">Retry</button>
+          <div class="option">
+            <div>
+              <div class="checkbox-wrapper">
+                <input type="checkbox" id="testResizing" checked>
+                <label for="testResizing">Test Different Sizes</label>
+              </div>
+              <p class="option-description">Tests your component at different sizes (small: 100x40, medium: 200x80, large: 300x120).</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <button id="runTests" class="sui-button sui-button-primary">Run Tests</button>
+    </div>
+
+    <div class="loading-overlay" id="loadingState">
+      <div class="spinner-container">
+        <div class="spinner"></div>
+        <div class="loading-text">Running Component Tests</div>
+        <p class="loading-subtext">Testing all property combinations, text variations, and size options. This may take a moment depending on the complexity of your component.</p>
+        <button id="cancelTests" class="sui-button sui-button-subtle">Cancel Tests</button>
+      </div>
+    </div>
   </div>
 
   <script>
-    document.getElementById("start-button").onclick = () => {
-      const loadingState = document.getElementById("loading-state");
-      const mainUI = document.getElementById("main-ui");
+    const content = document.querySelector('.content');
+    const loadingState = document.getElementById('loadingState');
+    const runButton = document.getElementById('runTests');
+    const cancelButton = document.getElementById('cancelTests');
+    let isRunning = false;
 
-      // Show the loading state and hide the main UI
-      loadingState.style.display = "block";
-      mainUI.style.display = "none";
+    function setRunningState(running) {
+      isRunning = running;
+      content.classList.toggle('hidden', running);
+      loadingState.classList.toggle('visible', running);
+      
+      if (!running) {
+        runButton.disabled = false;
+      }
+    }
 
-      // Send a message to the plugin to start the process
-      parent.postMessage({ pluginMessage: { type: "runTests" } }, "*");
-    };
+    document.getElementById('runTests').onclick = () => {
+      if (isRunning) return;
 
-    // Listen for messages from the plugin
-    window.onmessage = (event) => {
-      const loadingState = document.getElementById("loading-state");
-      const successState = document.getElementById("success-state");
-      const errorState = document.getElementById("error-state");
-      const mainUI = document.getElementById("main-ui");
+      const testTextLengths = document.getElementById('testTextLengths').checked;
+      const testResizing = document.getElementById('testResizing').checked;
+      
+      setRunningState(true);
+      
+      parent.postMessage({ 
+        pluginMessage: { 
+          type: 'runTests',
+          testTextLengths,
+          testResizing
+        }
+      }, '*');
+    }
 
-      if (event.data.pluginMessage.type === "finished") {
-        // Hide loading state and show success state
-        loadingState.style.display = "none";
-        successState.style.display = "block";
-      } else if (event.data.pluginMessage.type === "error") {
-        // Hide loading state and show error state
-        loadingState.style.display = "none";
-        errorState.style.display = "block";
+    document.getElementById('cancelTests').onclick = () => {
+      if (!isRunning) return;
+      
+      parent.postMessage({ 
+        pluginMessage: { 
+          type: 'cancelTests'
+        }
+      }, '*');
+
+      // Disable cancel button immediately to prevent multiple clicks
+      cancelButton.disabled = true;
+      cancelButton.textContent = 'Cancelling...';
+    }
+
+    onmessage = (event) => {
+      const message = event.data.pluginMessage;
+      
+      if (message.type === 'error') {
+        setRunningState(false);
+        
+        const error = document.createElement('p');
+        error.className = 'error';
+        error.textContent = message.message || 'Please select a component or component set to test.';
+        runButton.parentNode.insertBefore(error, runButton.nextSibling);
+        
+        setTimeout(() => {
+          error.remove();
+        }, 3000);
+      } else if (message.type === 'finished') {
+        const originalText = runButton.textContent;
+        runButton.textContent = 'Tests Complete!';
+        
+        setTimeout(() => {
+          setRunningState(false);
+          runButton.textContent = originalText;
+        }, 2000);
+      } else if (message.type === 'cancelled') {
+        setRunningState(false);
+        
+        // Show cancelled message
+        runButton.textContent = 'Tests Cancelled';
+        setTimeout(() => {
+          runButton.textContent = 'Run Tests';
+        }, 2000);
       }
     };
-
-    // Handle restart buttons for success and error states
-    document.getElementById("restart-button").onclick = () => {
-      const successState = document.getElementById("success-state");
-      const mainUI = document.getElementById("main-ui");
-
-      successState.style.display = "none";
-      mainUI.style.display = "block";
-    };
-
-    document.getElementById("restart-button-error").onclick = () => {
-      const errorState = document.getElementById("error-state");
-      const mainUI = document.getElementById("main-ui");
-
-      errorState.style.display = "none";
-      mainUI.style.display = "block";
-    };
-
-  </script> <!-- Link your JavaScript file -->
+  </script>
 </body>
 </html>
